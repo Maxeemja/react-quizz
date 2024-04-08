@@ -1,18 +1,20 @@
-import { ReactElement } from 'react';
+import { ReactElement, useContext } from 'react';
 import Answer from './Answer';
+import { QuizContext } from '../contexts/quiz';
 
-const Question = (props: object): ReactElement => {
+const Question = ({ questions }): ReactElement => {
+	const [quizState] = useContext(QuizContext);
+	const currentQuestion = quizState.questions[quizState.currentQuestionIndex];
 	return (
-		<>
-			<div className='question'>Text of Question</div>
-			<div>{props.questions}</div>
+		<div>
+			<div className='question'>{currentQuestion.question}</div>
 			<div className='answers'>
 				<Answer />
 				<Answer />
 				<Answer />
 				<Answer />
 			</div>
-		</>
+		</div>
 	);
 };
 
