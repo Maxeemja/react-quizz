@@ -1,13 +1,36 @@
-import { ReactElement, useContext } from 'react';
+import { ReactElement, useContext, useEffect } from 'react';
 import Question from './Question';
 import { QuizContext } from '../contexts/quiz';
 
 const Quiz = (): ReactElement => {
 	const [quizState, dispatch] = useContext(QuizContext);
+	const apiUrl = 'https://opentdb.com/api.php?amount=10&encode=url3986';
+
+	useEffect(() => {
+		if (quizState.questions.length > 0 || quizState.error) {
+			return;
+		}
+
+		fetch(apiUrl)
+			.then((res) => res.json())
+			.then((data) => {
+				console.log('data', data);
+				dispatch({ type: 'LOADED_DATA', payload: data.results });
+			})
+			.catch((error) => {
+				dispatch({ type: 'ERROR', payload: error.message });
+			});
+	});
 
 	return (
 		<div className='quiz'>
-			{!quizState.showResults ? (
+			{quizState.error && (
+				<div className='results'>
+					<div className='congratulations'>Server error </div>
+					<div className='results-info'>{quizState.error}</div>
+				</div>
+			)}
+			{!quizState.showResults && quizState.questions.length > 0 && (
 				<div>
 					<div className='score'>
 						Question {quizState.currentQuestionIndex + 1}/
@@ -21,7 +44,8 @@ const Quiz = (): ReactElement => {
 						Next question
 					</div>
 				</div>
-			) : (
+			)}
+			{quizState.showResults && (
 				<div className='results'>
 					<div className='congratulations'></div>
 					<div className='results-info'>
